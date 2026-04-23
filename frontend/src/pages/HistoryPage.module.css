@@ -1,0 +1,18 @@
+.page { display: flex; flex-direction: column; gap: 24px; }
+.header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.alertsList { display: flex; flex-direction: column; gap: 12px; }
+.alertCard { padding: 0; overflow: hidden; }
+.alertHeader {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.alertHeader:hover { background: var(--bg-elevated); }
+.alertDetails { padding: 0 20px 20px; border-top: 1px solid var(--border); }
+.detailGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 16px 0; }
+.detailBox { background: var(--bg-elevated); border-radius: var(--radius-sm); padding: 12px; }
+.detailLabel { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.detailValue { font-size: 13px; color: var(--text-secondary); }
+.contactsNotified { background: var(--bg-elevated); border-radius: var(--radius-sm); padding: 12px; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 16px; }

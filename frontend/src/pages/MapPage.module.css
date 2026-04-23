@@ -1,0 +1,249 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: calc(100vh - 64px);
+  min-height: calc(100dvh - 64px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.headerCopy {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.headerActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.summaryCard {
+  padding: 18px 24px;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: center;
+}
+
+.summaryLabel {
+  margin-bottom: 4px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.summaryValue {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.badgesRow {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.errorText {
+  margin-top: 12px;
+  color: #ff9b9b;
+  font-size: 13px;
+}
+
+.layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(320px, 0.9fr);
+  gap: 20px;
+}
+
+.mapCard {
+  min-height: 520px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.placesPanel {
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(15, 240, 200, 0.05), transparent 20%),
+    var(--bg-card);
+  overflow: hidden;
+}
+
+.panelHeader {
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panelTitle {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+}
+
+.panelCopy {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.panelState {
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.placeSections {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px;
+  overflow-y: auto;
+}
+
+.placeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sectionHeading {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.emptyPlaces {
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.placeCard {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.activePlaceCard {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 0 1px var(--border-glow);
+}
+
+.placeInfoButton {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: var(--text-primary);
+}
+
+.placeName {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.placeAddress {
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.placeMeta {
+  margin-top: 8px;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.navigateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  min-width: 90px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--pink);
+  color: var(--pink);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.navigateButton:hover {
+  background: var(--pink-glow);
+}
+
+.apiNotice {
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+.apiNotice code {
+  color: var(--pink);
+}
+
+@media (max-width: 1080px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .placesPanel,
+  .mapCard {
+    min-height: 420px;
+  }
+}
+
+@media (max-width: 680px) {
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .badgesRow {
+    justify-content: flex-start;
+  }
+
+  .placeCard {
+    flex-direction: column;
+  }
+
+  .navigateButton {
+    width: 100%;
+  }
+}

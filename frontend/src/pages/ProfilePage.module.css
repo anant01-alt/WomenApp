@@ -1,0 +1,22 @@
+.page { display: flex; flex-direction: column; gap: 20px; }
+.profileHero { display: flex; align-items: center; gap: 20px; }
+.heroAvatar {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 30px;
+  flex-shrink: 0;
+}
+.tabs { display: flex; gap: 4; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px; }
+.tab {
+  flex: 1; padding: 9px 16px; border: none; background: transparent;
+  color: var(--text-muted); border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+}
+.tab:hover { color: var(--text-primary); }
+.activeTab { background: var(--bg-elevated); color: var(--pink) !important; border: 1px solid var(--border-glow); }
+.form { display: flex; flex-direction: column; gap: 16px; }
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+@media (max-width: 768px) { .formGrid { grid-template-columns: 1fr; } }

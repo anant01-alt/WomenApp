@@ -1,0 +1,47 @@
+.page { display: flex; flex-direction: column; gap: 24px; }
+.header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+
+.form { display: flex; flex-direction: column; gap: 16px; }
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.checkLabel { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: var(--text-secondary); }
+.checkLabel input { width: auto; }
+
+.contactsGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+.contactCard { position: relative; display: flex; flex-direction: column; gap: 14px; }
+.primaryCard { border-color: var(--border-glow); box-shadow: 0 0 20px var(--pink-glow); }
+.primaryBadge { position: absolute; top: 16px; right: 16px; }
+
+.cardHeader { display: flex; align-items: center; gap: 14px; }
+.bigAvatar {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 22px;
+  flex-shrink: 0;
+}
+
+.contactDetails { display: flex; flex-direction: column; gap: 6px; padding: 12px; background: var(--bg-elevated); border-radius: var(--radius-sm); }
+.detailRow { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+
+.cardActions { display: flex; gap: 8px; }
+
+.addSlot {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 200px;
+}
+.addSlot:hover { border-color: var(--pink); color: var(--pink); background: var(--pink-glow); }
+
+@media (max-width: 768px) {
+  .formGrid { grid-template-columns: 1fr; }
+}
