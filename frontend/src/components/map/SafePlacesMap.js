@@ -1,5 +1,5 @@
 import React from 'react';
-import { Circle, GoogleMap, InfoWindow, Marker } from '@react-google-maps/api';
+import { Circle, DirectionsRenderer, GoogleMap, InfoWindow, Marker } from '@react-google-maps/api';
 
 const mapContainerStyle = { width: '100%', height: '100%' };
 const defaultCenter = { lat: 28.6139, lng: 77.209 }; 
@@ -44,7 +44,9 @@ export default function SafePlacesMap({
   isEmergency,
   places,
   selectedPlace,
+  directions,
   onSelectPlace,
+  onClearSelection,
   onMapLoad,
 }) {
   const currentUserIcon = createMarkerIcon('#e91e8c', 'Y');
@@ -95,13 +97,30 @@ export default function SafePlacesMap({
             position={place.location}
             icon={getPlaceIcon(place.type)}
             onClick={() => onSelectPlace(place)}
+            animation={
+              selectedPlace?.id === place.id ? window.google.maps.Animation.BOUNCE : undefined
+            }
           />
         ))}
+
+        {directions ? (
+          <DirectionsRenderer
+            directions={directions}
+            options={{
+              suppressMarkers: true,
+              polylineOptions: {
+                strokeColor: '#e91e8c',
+                strokeOpacity: 0.85,
+                strokeWeight: 5,
+              },
+            }}
+          />
+        ) : null}
 
         {selectedPlace ? (
           <InfoWindow
             position={selectedPlace.location}
-            onCloseClick={() => onSelectPlace(null)}
+            onCloseClick={onClearSelection}
           >
             <div style={{ color: '#111', maxWidth: 220 }}>
               <strong>{selectedPlace.name}</strong>

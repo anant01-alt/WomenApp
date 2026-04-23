@@ -5,6 +5,7 @@ import NearbyPlacesPanel from '../components/map/NearbyPlacesPanel';
 import SafePlacesMap from '../components/map/SafePlacesMap';
 import useGoogleMapsLoader from '../hooks/useGoogleMapsLoader';
 import useCurrentLocation from '../hooks/useCurrentLocation';
+import usePlaceDirections from '../hooks/usePlaceDirections';
 import useNearbySafePlaces from '../hooks/useNearbySafePlaces';
 import { useSOS } from '../context/SOSContext';
 import { emitLocation } from '../services/socket';
@@ -63,8 +64,18 @@ export default function MapPage() {
     setSelectedPlace,
     getDirectionsUrl,
   } = useNearbySafePlaces({
-    map,
     location,
+    isLoaded,
+  });
+
+  const {
+    directions,
+    routeError,
+    loadingRoute,
+    clearRoute,
+  } = usePlaceDirections({
+    origin: location,
+    selectedPlace,
   });
 
   useEffect(() => {
@@ -110,10 +121,16 @@ export default function MapPage() {
       setSelectedPlace(place);
       if (place?.location && map) {
         map.panTo(place.location);
+        map.setZoom(15);
       }
     },
     [map, setSelectedPlace]
   );
+
+  const handleResetSelection = useCallback(() => {
+    setSelectedPlace(null);
+    clearRoute();
+  }, [clearRoute, setSelectedPlace]);
 
   if (apiKeyMissing) {
     return (
@@ -174,7 +191,7 @@ export default function MapPage() {
         tracking={tracking}
         isEmergency={isEmergency}
         nearbyCount={places.length}
-        locationError={locationError}
+        locationError={locationError || placesError || routeError}
       />
 
       <div className={styles.layout}>
@@ -184,7 +201,9 @@ export default function MapPage() {
             isEmergency={isEmergency}
             places={places}
             selectedPlace={selectedPlace}
+            directions={directions}
             onSelectPlace={handleSelectPlace}
+            onClearSelection={handleResetSelection}
             onMapLoad={handleMapLoad}
           />
         </div>
@@ -194,7 +213,10 @@ export default function MapPage() {
           loadingPlaces={loadingPlaces}
           placesError={placesError}
           selectedPlace={selectedPlace}
+          loadingRoute={loadingRoute}
+          routeError={routeError}
           onSelectPlace={handleSelectPlace}
+          onClearSelection={handleResetSelection}
           getDirectionsUrl={getDirectionsUrl}
         />
       </div>

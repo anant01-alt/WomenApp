@@ -19,7 +19,10 @@ export default function NearbyPlacesPanel({
   loadingPlaces,
   placesError,
   selectedPlace,
+  loadingRoute,
+  routeError,
   onSelectPlace,
+  onClearSelection,
   getDirectionsUrl,
 }) {
   return (
@@ -31,6 +34,20 @@ export default function NearbyPlacesPanel({
 
       {loadingPlaces ? <div className={styles.panelState}>Loading nearby places...</div> : null}
       {placesError ? <div className={styles.panelState}>{placesError}</div> : null}
+      {loadingRoute ? <div className={styles.panelState}>Loading route...</div> : null}
+      {routeError ? <div className={styles.panelState}>{routeError}</div> : null}
+
+      {selectedPlace && selectedPlace.id !== 'me' ? (
+        <div className={styles.selectedPlaceBar}>
+          <div>
+            <div className={styles.selectedPlaceLabel}>Selected Place</div>
+            <div className={styles.selectedPlaceName}>{selectedPlace.name}</div>
+          </div>
+          <button type="button" className="btn-ghost" onClick={onClearSelection}>
+            Clear
+          </button>
+        </div>
+      ) : null}
 
       {!loadingPlaces && !placesError ? (
         <div className={styles.placeSections}>

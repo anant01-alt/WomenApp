@@ -112,6 +112,29 @@
   font-size: 14px;
 }
 
+.selectedPlaceBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(233, 30, 140, 0.06);
+}
+
+.selectedPlaceLabel {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.selectedPlaceName {
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
 .placeSections {
   display: flex;
   flex-direction: column;

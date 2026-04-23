@@ -3,21 +3,20 @@ import { buildDirectionsUrl, fetchNearbySafePlaces } from '../services/placesSer
 
 const DEFAULT_RADIUS = Number(process.env.REACT_APP_SAFE_PLACES_RADIUS || 3000);
 
-export default function useNearbySafePlaces({ map, location }) {
+export default function useNearbySafePlaces({ location, isLoaded }) {
   const [places, setPlaces] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [loadingPlaces, setLoadingPlaces] = useState(false);
   const [placesError, setPlacesError] = useState('');
 
   const refreshPlaces = useCallback(async () => {
-    if (!map || !location) return;
+    if (!isLoaded || !location) return;
 
     setLoadingPlaces(true);
     setPlacesError('');
 
     try {
       const results = await fetchNearbySafePlaces({
-        map,
         location,
         radius: DEFAULT_RADIUS,
       });
@@ -27,11 +26,12 @@ export default function useNearbySafePlaces({ map, location }) {
         current ? results.find((place) => place.id === current.id) || null : null
       );
     } catch (error) {
+      setPlaces([]);
       setPlacesError(error.message || 'Unable to load nearby safe places.');
     } finally {
       setLoadingPlaces(false);
     }
-  }, [location, map]);
+  }, [isLoaded, location]);
 
   useEffect(() => {
     refreshPlaces();
