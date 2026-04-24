@@ -1,326 +1,210 @@
-# 🛡️ SafeGuard — AI-Powered Women Safety & Emergency Response System
+# SafeGuard
 
-A full-stack MERN web application to enhance women's safety through real-time SOS alerts, GPS tracking, emergency contacts, AI-based threat detection, and live chat.
+A women's safety web app — real-time SOS with live GPS, trusted-contact web push alerts, safety check-in timer, passcode-gated live-location sharing, shake detection, voice SOS, and an admin dashboard. Built on **Next.js 16 + Supabase + Vercel**, on free tiers end-to-end.
+
+> **Not a substitute for emergency services.** Always call 112 (India / EU), 911 (US), or 1091 (Indian women's helpline) in a life-threatening emergency.
 
 ---
 
-## 📁 Project Structure
+## Project layout
 
 ```
-womensafety/
-├── backend/                    # Node.js + Express + MongoDB
-│   ├── config/
-│   │   └── db.js               # MongoDB connection
-│   ├── controllers/
-│   │   ├── authController.js   # Register, Login, Me
-│   │   ├── userController.js   # Profile, Contacts, Location
-│   │   ├── sosController.js    # SOS trigger, resolve, history
-│   │   ├── chatController.js   # Messages, rooms
-│   │   └── adminController.js  # Admin dashboard, user/alert mgmt
-│   ├── middleware/
-│   │   ├── authMiddleware.js   # JWT protect + adminOnly
-│   │   └── errorMiddleware.js  # Global error handler
-│   ├── models/
-│   │   ├── User.js             # User schema + bcrypt
-│   │   ├── EmergencyContact.js # Trusted contacts schema
-│   │   ├── Alert.js            # SOS alert schema
-│   │   ├── Message.js          # Chat message schema
-│   │   └── LocationLog.js      # GPS history schema
-│   ├── routes/
-│   │   ├── authRoutes.js
-│   │   ├── userRoutes.js
-│   │   ├── sosRoutes.js
-│   │   ├── chatRoutes.js
-│   │   └── adminRoutes.js
-│   ├── socket/
-│   │   └── socketManager.js    # Socket.IO: location, chat, SOS events
-│   ├── seed.js                 # Database seed script
-│   ├── server.js               # Entry point
-│   ├── package.json
-│   └── .env.example
-│
-├── frontend/                   # React.js + CSS Modules
-│   ├── public/
-│   │   └── index.html
-│   └── src/
-│       ├── components/
-│       │   ├── common/
-│       │   │   ├── Sidebar.js          # Desktop sidebar nav
-│       │   │   ├── MobileNav.js        # Mobile bottom nav
-│       │   │   └── LoadingScreen.js
-│       │   └── sos/
-│       │       └── EmergencyBanner.js  # Active SOS top banner
-│       ├── context/
-│       │   ├── AuthContext.js          # Global auth state
-│       │   └── SOSContext.js           # Emergency state + GPS tracking
-│       ├── pages/
-│       │   ├── LoginPage.js
-│       │   ├── RegisterPage.js
-│       │   ├── DashboardPage.js        # Stats + AI assessment + quick actions
-│       │   ├── SOSPage.js              # Hold-to-SOS button
-│       │   ├── MapPage.js              # Google Maps / OpenStreetMap
-│       │   ├── ChatPage.js             # Real-time messaging
-│       │   ├── ContactsPage.js         # CRUD emergency contacts
-│       │   ├── HistoryPage.js          # Incident log
-│       │   ├── ProfilePage.js          # Edit profile + password
-│       │   ├── AdminPage.js            # Admin dashboard
-│       │   └── NotFoundPage.js
-│       ├── services/
-│       │   ├── api.js                  # Axios + all API calls
-│       │   └── socket.js               # Socket.IO client
-│       ├── App.js                      # Routes + layout
-│       ├── index.js
-│       ├── index.css                   # Design system (CSS variables)
-│       └── .env.example
-│
-└── package.json                # Root — run both together
+WomenApp/
+├── .git/
+├── .gitignore
+├── README.md                 ← you are here (deployment guide)
+└── safeguard/                ← the Next.js 16 app
+    ├── app/                  ← App Router (routes, layouts, server actions)
+    ├── components/           ← shadcn/ui + feature components + layout shell
+    ├── lib/                  ← supabase clients, validation (Zod), push, utils
+    ├── supabase/             ← migrations + seed SQL
+    ├── proxy.ts              ← auth middleware (v16 renamed from middleware.ts)
+    └── ... (next.config.ts, package.json, etc.)
 ```
 
 ---
 
-## ⚡ Quick Start
+## Wave 0 — what's done
 
-### Prerequisites
-- Node.js v18+
-- MongoDB (local or Atlas)
-- npm or yarn
+✅ **Scaffold** — Next.js 16.2, React 19, Tailwind v4, TypeScript
+✅ **Design system** — shadcn/ui (base-nova), dark navy + pink theme, Syne + DM Sans fonts
+✅ **App shell** — responsive sidebar (desktop) + bottom-tab nav (mobile) + sticky header + user menu with sign-out
+✅ **Auth flow** — email-OTP sign-in, Supabase SSR cookies, `proxy.ts` route protection
+✅ **Legal pages** — Privacy Policy, Terms of Service, disclaimer banners
+✅ **Landing page** — hero, stats bar, features, how-it-works, trust section, CTA, footer
+✅ **12 routes compiling** — `/`, `/sign-in`, `/dashboard`, `/sos`, `/contacts`, `/map`, `/checkin`, `/tracking`, `/history`, `/settings`, `/privacy`, `/terms`
+✅ **Database migrations** — 4 idempotent SQL files covering tables, RLS, functions/triggers, admin bootstrap, plus a seed
+✅ **Zod validation schemas** — shared between server actions and client forms
+✅ **Audit log + rate limit tables** — SOS abuse guard, idempotency keys for cron
+✅ **Supabase clients** — `browser.ts` / `server.ts` / `service.ts` (`server-only`-gated)
 
 ---
 
-### Step 1 — Clone & Install
+## Everything you need to do before deployment
+
+### 1. Local setup (5 minutes)
 
 ```bash
-# Clone the project
-git clone <your-repo-url>
-cd womensafety
-
-# Install all dependencies (backend + frontend)
-npm run install:all
-```
-
-Or manually:
-```bash
-cd backend && npm install
-cd ../frontend && npm install
-```
-
----
-
-### Step 2 — Configure Environment Variables
-
-**Backend** (`backend/.env`):
-```env
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/womensafety
-JWT_SECRET=your_super_secret_key_change_in_production
-JWT_EXPIRE=7d
-CLIENT_URL=http://localhost:3000
-
-# Optional: Twilio for real SMS
-TWILIO_ACCOUNT_SID=your_twilio_sid
-TWILIO_AUTH_TOKEN=your_twilio_token
-TWILIO_PHONE_NUMBER=+1234567890
-```
-
-**Frontend** (`frontend/.env`):
-```env
-REACT_APP_API_URL=http://localhost:5000/api
-REACT_APP_SOCKET_URL=http://localhost:5000
-REACT_APP_GOOGLE_MAPS_KEY=your_google_maps_api_key
-```
-
-> 💡 **No Google Maps key?** The app falls back to OpenStreetMap automatically.
-
----
-
-### Step 3 — Seed the Database
-
-```bash
-npm run seed
-# or: cd backend && node seed.js
-```
-
-Creates:
-| Role  | Email                  | Password  |
-|-------|------------------------|-----------|
-| User  | demo@safeguard.com     | demo123   |
-| Admin | admin@safeguard.com    | admin123  |
-
----
-
-### Step 4 — Run the App
-
-```bash
-# Run both backend + frontend together
+cd safeguard
+cp .env.local.example .env.local   # fill in the blanks — see step 3
 npm run dev
+# → http://localhost:3000
 ```
 
-Or separately:
+### 2. Install the Vercel CLI (needed for `vercel env pull` and `vercel deploy`)
+
 ```bash
-# Terminal 1 — Backend (port 5000)
-cd backend && npm run dev
-
-# Terminal 2 — Frontend (port 3000)
-cd frontend && npm start
+npm i -g vercel
 ```
 
-Open: **http://localhost:3000**
+### 3. Create the Supabase project
+
+1. Sign up free at <https://supabase.com>. No card needed.
+2. Create a new project. **Region: `ap-south-1` (Mumbai)** if you're in India, otherwise pick nearest.
+3. Wait ~1 min for provisioning.
+4. From **Settings → API**, copy:
+   - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
+   - `anon` public key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (keep secret, server-only)
+   - JWT Secret (**Settings → API → JWT Settings**) → `SUPABASE_JWT_SECRET`
+
+### 4. Run the database migrations
+
+Option A — Supabase SQL editor (easiest):
+
+1. Open your project → **SQL Editor** → **New query**.
+2. Paste the contents of each file **in this order** and run:
+   1. `safeguard/supabase/migrations/20260423000000_init.sql`
+   2. `safeguard/supabase/migrations/20260423000100_rls.sql`
+   3. `safeguard/supabase/migrations/20260423000200_functions.sql`
+   4. Sign up once via `/sign-in` in the app (creates your auth.users row).
+   5. Edit `20260423000300_bootstrap_admin.sql` — change the email to yours — then run it to grant yourself admin.
+   6. (Optional) Run `safeguard/supabase/seed.sql` for demo data.
+
+Option B — Supabase CLI (once you get comfortable):
+
+```bash
+npm i -g supabase
+cd safeguard
+supabase link --project-ref YOUR_PROJECT_REF
+supabase db push
+```
+
+### 5. Generate Web Push VAPID keys
+
+```bash
+cd safeguard
+npx web-push generate-vapid-keys
+```
+
+Copy both keys into `.env.local`:
+
+- `VAPID_PUBLIC_KEY` and `NEXT_PUBLIC_VAPID_PUBLIC_KEY` get the same public value.
+- `VAPID_PRIVATE_KEY` is server-only, never prefixed with `NEXT_PUBLIC_`.
+- `VAPID_SUBJECT` is `mailto:you@example.com` — required by the push spec.
+
+### 6. Generate `CRON_SECRET`
+
+Any random 32-byte string. Example:
+
+```bash
+# bash / zsh / git-bash / WSL
+openssl rand -base64 32
+
+# PowerShell
+[Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+```
+
+Paste into `.env.local` as `CRON_SECRET`. Vercel will auto-inject this as an `Authorization: Bearer` header on every cron invocation.
+
+### 7. Generate TypeScript types from Supabase
+
+Once migrations are live:
+
+```bash
+cd safeguard
+npx supabase gen types typescript --project-id YOUR_PROJECT_REF > types/database.types.ts
+```
+
+### 8. Deploy to Vercel (Wave 5)
+
+```bash
+cd safeguard
+vercel                          # first-time link
+# Follow prompts — accept defaults. This creates the Vercel project.
+
+# Then, upload your env vars:
+vercel env add NEXT_PUBLIC_SUPABASE_URL
+vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY
+vercel env add SUPABASE_SERVICE_ROLE_KEY
+vercel env add SUPABASE_JWT_SECRET
+vercel env add VAPID_PUBLIC_KEY
+vercel env add VAPID_PRIVATE_KEY
+vercel env add NEXT_PUBLIC_VAPID_PUBLIC_KEY
+vercel env add VAPID_SUBJECT
+vercel env add CRON_SECRET
+vercel env add NEXT_PUBLIC_APP_URL        # https://your-project.vercel.app
+
+# First production deploy:
+vercel deploy --prod
+```
 
 ---
 
-## 🌐 API Reference
+## Free-tier budget cheat sheet
 
-### Auth
-| Method | Endpoint             | Access  | Description          |
-|--------|----------------------|---------|----------------------|
-| POST   | /api/auth/register   | Public  | Register user        |
-| POST   | /api/auth/login      | Public  | Login + get token    |
-| GET    | /api/auth/me         | Private | Get current user     |
-| PUT    | /api/auth/password   | Private | Change password      |
+| Service            | Free limit                 | Watch out for                                          |
+| ------------------ | -------------------------- | ------------------------------------------------------ |
+| Vercel Hobby       | 100 GB bandwidth/month     | Realtime on the /track page streams continuously       |
+| Vercel Cron        | 2 jobs, min 1-min schedule | We use exactly 2: check-in sweep + retention sweep     |
+| Supabase DB        | 500 MB                     | Retention cron prunes `location_logs` >30d             |
+| Supabase Storage   | 1 GB                       | Voice SOS clips — ~200 KB each                         |
+| Supabase egress    | 2 GB/month                 | Throttle `location_logs` writes to 1 per 5-10 s        |
+| Supabase MAU       | 50,000                     | Ignore — way below this                                |
+| **Inactivity pause** | **after 7 days idle**    | **Critical risk.** Keep-alive cron hits an endpoint weekly |
 
-### Users
-| Method | Endpoint                   | Access  | Description              |
-|--------|----------------------------|---------|--------------------------|
-| PUT    | /api/users/profile         | Private | Update profile           |
-| GET    | /api/users/contacts        | Private | List emergency contacts  |
-| POST   | /api/users/contacts        | Private | Add contact              |
-| PUT    | /api/users/contacts/:id    | Private | Update contact           |
-| DELETE | /api/users/contacts/:id    | Private | Remove contact           |
-| POST   | /api/users/location        | Private | Update GPS location      |
-| GET    | /api/users/location-history| Private | Get location logs        |
-
-### SOS
-| Method | Endpoint               | Access  | Description              |
-|--------|------------------------|---------|--------------------------|
-| POST   | /api/sos/trigger       | Private | Trigger SOS alert        |
-| GET    | /api/sos/active        | Private | Get active alert         |
-| GET    | /api/sos/history       | Private | Get alert history        |
-| GET    | /api/sos/:id           | Private | Get single alert         |
-| PUT    | /api/sos/:id/location  | Private | Update alert location    |
-| PUT    | /api/sos/:id/resolve   | Private | Resolve/cancel alert     |
-
-### Chat
-| Method | Endpoint          | Access  | Description        |
-|--------|-------------------|---------|--------------------|
-| GET    | /api/chat/rooms   | Private | Get user's rooms   |
-| GET    | /api/chat/:room   | Private | Get room messages  |
-| POST   | /api/chat/:room   | Private | Send a message     |
-
-### Admin
-| Method | Endpoint                        | Admin | Description           |
-|--------|---------------------------------|-------|-----------------------|
-| GET    | /api/admin/stats                | ✅    | Dashboard stats       |
-| GET    | /api/admin/users                | ✅    | List all users        |
-| PUT    | /api/admin/users/:id/toggle     | ✅    | Activate/deactivate   |
-| GET    | /api/admin/alerts               | ✅    | List all alerts       |
-| PUT    | /api/admin/alerts/:id/resolve   | ✅    | Resolve alert         |
+The keep-alive cron is a Wave 5 task (weekly GitHub Action or a third Vercel cron slot).
 
 ---
 
-## 🔌 Socket.IO Events
+## Security and compliance checklist (before real users)
 
-### Client → Server
-| Event           | Payload                        | Description                  |
-|-----------------|--------------------------------|------------------------------|
-| location_update | { lat, lng, alertId }          | Send GPS position            |
-| watch_user      | userId                         | Subscribe to user's location |
-| unwatch_user    | userId                         | Unsubscribe                  |
-| join_room       | roomId                         | Join a chat room             |
-| leave_room      | roomId                         | Leave a chat room            |
-| send_message    | { room, content, receiverId }  | Send chat message            |
-| typing          | { room, isTyping }             | Typing indicator             |
-
-### Server → Client
-| Event            | Description                          |
-|------------------|--------------------------------------|
-| location_update  | Real-time GPS of a tracked user      |
-| sos_triggered    | New SOS alert broadcast              |
-| alert_resolved   | Alert status changed to resolved     |
-| new_message      | New chat message in a room           |
-| user_typing      | Typing indicator for a user          |
-| user_online      | User came online                     |
-| user_offline     | User went offline                    |
+- [ ] Email deliverability: Supabase default sender lands in spam for Gmail → swap to Resend (100 free emails/day) via **Auth → SMTP Settings**.
+- [ ] `SUPABASE_JWT_SECRET` rotated from default (if you ever commit one to git by accident).
+- [ ] Admin bootstrap migration (`20260423000300`) reverted to a placeholder before re-committing — don't ship your email in public migrations.
+- [ ] Privacy Policy at `/privacy` updated with your actual company name, contact email, jurisdiction.
+- [ ] Terms of Service at `/terms` reviewed by a lawyer before processing real-user safety data.
+- [ ] Age-gate (`age_confirmed_18`) enforced during sign-up (Wave 1 task).
+- [ ] Emergency-contact consent checkbox in Contacts page (Wave 1 task).
+- [ ] Account deletion + JSON export available in Settings (Wave 5 task).
 
 ---
 
-## ✨ Features
+## Upcoming waves
 
-| Feature                  | Status | Details                                      |
-|--------------------------|--------|----------------------------------------------|
-| JWT Authentication       | ✅     | Register, login, protected routes            |
-| User Dashboard           | ✅     | Stats, quick actions, AI assessment          |
-| SOS Emergency Button     | ✅     | Hold-3s trigger, cancel, preset messages     |
-| Emergency Contacts       | ✅     | Add/edit/delete up to 5 contacts             |
-| Real-time GPS Tracking   | ✅     | Browser Geolocation + Socket.IO broadcast    |
-| Google Maps Integration  | ✅     | Falls back to OpenStreetMap if no key        |
-| Live Emergency Chat      | ✅     | Socket.IO, typing indicators, read receipts  |
-| AI Safety Assessment     | ✅     | Time + location based risk scoring           |
-| Incident History         | ✅     | Paginated, filterable alert log              |
-| Mock SMS Alerts          | ✅     | Console log (Twilio-ready in production)     |
-| Admin Panel              | ✅     | User mgmt, alert resolution, stats           |
-| Responsive Design        | ✅     | Mobile nav + sidebar for desktop             |
+| Wave  | Scope                                                                 |
+| ----- | --------------------------------------------------------------------- |
+| **1** | Profile CRUD, Contacts CRUD, History page, Map with Leaflet + Overpass, Chat |
+| **2** | Web push subscriptions, SOS button + server action, rate limiter, audit log writes, admin read-only alerts chart |
+| **3** | Shake detector, Voice SOS (MediaRecorder → Storage → signed URL), Fake Call |
+| **4** | Check-in timer + Vercel Cron, Retention cron, Share Live Location with custom-JWT RLS |
+| **5** | Admin dashboard (users, alerts, heatmap), PWA polish, keep-alive cron, production deploy |
 
 ---
 
-## 🚀 Deployment
+## Tech stack
 
-### Backend (e.g. Render / Railway)
-1. Set all env vars from `.env.example`
-2. Set `NODE_ENV=production`
-3. Build command: `npm install`
-4. Start command: `node server.js`
-
-### Frontend (e.g. Vercel / Netlify)
-1. Set `REACT_APP_API_URL` to your backend URL
-2. Set `REACT_APP_SOCKET_URL` to your backend URL
-3. Set `REACT_APP_GOOGLE_MAPS_KEY` (optional)
-4. Build command: `npm run build`
-5. Output directory: `build`
-
-### MongoDB
-Use **MongoDB Atlas** free tier for cloud hosting.  
-Set `MONGO_URI=mongodb+srv://...` in backend env.
+- **Framework** — Next.js 16.2 (App Router) + React 19 + TypeScript
+- **Styling** — Tailwind CSS v4 + shadcn/ui (`base-nova`) + Syne + DM Sans
+- **Auth + DB + Realtime + Storage** — Supabase (free tier)
+- **Hosting + Cron** — Vercel (Hobby free)
+- **Maps** — Leaflet + OpenStreetMap tiles + Overpass API (zero cost, no billing account)
+- **Push** — Web Push (VAPID) via service worker, `web-push` library
+- **Validation** — Zod shared between server actions and client forms
+- **Icons** — lucide-react
 
 ---
 
-## 🔒 Security Features
+## License
 
-- Passwords hashed with **bcrypt** (salt rounds: 12)
-- **JWT** tokens with configurable expiry
-- **Helmet.js** for HTTP security headers
-- **Rate limiting** (200 req / 15 min per IP)
-- **CORS** restricted to frontend origin
-- Socket.IO connections authenticated via JWT
-
----
-
-## 📦 Tech Stack
-
-| Layer       | Technology                        |
-|-------------|-----------------------------------|
-| Frontend    | React 18, React Router 6          |
-| Styling     | CSS Modules, CSS Variables        |
-| State       | Context API (Auth + SOS)          |
-| HTTP Client | Axios                             |
-| Real-time   | Socket.IO (client + server)       |
-| Backend     | Node.js, Express.js               |
-| Database    | MongoDB with Mongoose             |
-| Auth        | JWT + bcryptjs                    |
-| Maps        | Google Maps API / OpenStreetMap   |
-| SMS         | Twilio (mock by default)          |
-| Fonts       | Syne + DM Sans (Google Fonts)     |
-
----
-
-## 🆘 Emergency Helplines (India)
-
-| Service                  | Number |
-|--------------------------|--------|
-| Women Helpline           | 1091   |
-| Police                   | 100    |
-| National Emergency       | 112    |
-| Domestic Violence        | 181    |
-
----
-
-*Built with ❤️ for women's safety.*
+Private project. See [safeguard/AGENTS.md](safeguard/AGENTS.md) for project conventions.
