@@ -102,7 +102,7 @@ export async function unsubscribePush(endpoint: string): Promise<ActionState> {
   return { ok: true };
 }
 
-export async function deleteAccount(): Promise<ActionState> {
+export async function deleteAccount(_fd: FormData): Promise<void> {
   const user = await requireUser();
 
   await writeAudit({
@@ -114,7 +114,7 @@ export async function deleteAccount(): Promise<ActionState> {
 
   const svc = createServiceClient();
   const { error } = await svc.auth.admin.deleteUser(user.id);
-  if (error) return { error: error.message };
+  if (error) throw new Error(error.message);
 
   redirect("/");
 }
